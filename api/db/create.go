@@ -1,24 +1,26 @@
 package db
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
-func (db Database) CreateRecord(entry Entry) (Entry, error) {
+func (dao Dao) CreateRecord(entry Entry) (Entry, error) {
 	//entry.PK = uuid.New().String()
-	entityParsed, err := dynamodbattribute.MarshalMap(entry)
+	entityParsed, err := attributevalue.MarshalMap(entry)
 	if err != nil {
 		return Entry{}, err
 	}
 
 	input := &dynamodb.PutItemInput{
 		Item:      entityParsed,
-		TableName: aws.String(db.tablename),
+		TableName: aws.String(dao.db.TableName),
 	}
 
-	_, err = db.Client.PutItem(input)
+	_, err = dao.db.Client.PutItem(context.Background(), input)
 	if err != nil {
 		return Entry{}, err
 	}

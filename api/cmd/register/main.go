@@ -4,17 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 
+	"github.com/juddrollins/twitter-dupe/cmd/config"
 	"github.com/juddrollins/twitter-dupe/db"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	//"github.com/aws/aws-lambda-go/lambda"
 )
 
-// TODO best way to develop locally with lambda?
-
 type Response events.APIGatewayProxyResponse
+
+type CTX struct {
+	cfig config.Config
+	dao  *db.Dao
+}
 
 func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
@@ -22,8 +26,13 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	var entry db.Entry
 	json.Unmarshal([]byte(event.Body), &entry)
 
-	var dbConnection = db.InitDatabase()
-	var testValue, err = dbConnection.CreateRecord(entry)
+	var cfig = config.New()
+	var ctx = &CTX{
+		cfig: cfig,
+		dao:  db.InitDb(&cfig.Ddb),
+	}
+
+	var testValue, err = ctx.dao.CreateRecord(entry)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -48,18 +57,7 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 }
 
 func main() {
+	log.Println("Register Lambda Started")
 	lambda.Start(Handler)
-	// var dbConnection = db.InitDatabase()
-	// var testValue, err = dbConnection.CreateRecord(db.Entry{PK: "test", SK: "sortIt", Data: "test"})
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// }
-	// fmt.Println(testValue)
-
-	// var testValue, err = dbConnection.GetRecord("it", "sortIt")
-	// if err != nil {
-	// 	fmt.Println(err.Error())
-	// }
-	// fmt.Println(testValue.Data)
 
 }

@@ -1,28 +1,24 @@
 package db
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"context"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-func (db Database) GetRecord(PK string, SK string) (Entry, error) {
+func (dao Dao) GetRecord(PK string, SK string) (Entry, error) {
 
-	// input := &dynamodb.GetItemInput{TableName: aws.String(db.tablename),
-	// 	Key: map[string]*dynamodb.AttributeValue{
-	// 		"PK": {
-	// 			S: &PK,
-	// 		},
-	// 	}}
-
-	result, err := db.Client.GetItem(&dynamodb.GetItemInput{
-		TableName: aws.String(db.tablename),
-		Key: map[string]*dynamodb.AttributeValue{
-			"PK": {
-				S: aws.String(PK),
+	result, err := dao.db.Client.GetItem(context.Background(), &dynamodb.GetItemInput{
+		TableName: aws.String(dao.db.TableName),
+		Key: map[string]types.AttributeValue{
+			"PK": &types.AttributeValueMemberS{
+				Value: PK,
 			},
-			"SK": {
-				S: aws.String(SK),
+			"SK": &types.AttributeValueMemberS{
+				Value: SK,
 			},
 		}})
 	if err != nil {
@@ -30,7 +26,7 @@ func (db Database) GetRecord(PK string, SK string) (Entry, error) {
 	}
 
 	var entry Entry
-	err = dynamodbattribute.UnmarshalMap(result.Item, &entry)
+	err = attributevalue.UnmarshalMap(result.Item, &entry)
 	if err != nil {
 		return Entry{}, err
 	}

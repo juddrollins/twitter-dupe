@@ -23,7 +23,8 @@ provider:
           Resource:
             - Fn::GetAtt: [ UsersTable, Arn ]
   environment:
-    USERS_TABLE: ${self:custom.tableName}
+    DDB_TABLE_NAME: ${self:custom.tableName}
+    ENV: ${sls:stage}
 
 # you can overwrite defaults here
 #  stage: dev
@@ -64,8 +65,11 @@ functions:
       - httpApi:
           path: /register
           method: post
+  user:
+    handler: bin/user
+    events:
       - httpApi:
-          path: /user
+          path: /user/{id}
           method: get
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
