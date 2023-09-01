@@ -3,6 +3,7 @@
 build:
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/register cmd/register/main.go
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/user cmd/user/main.go
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/login cmd/login/main.go
 
 clean:
 	rm -rf ./bin
