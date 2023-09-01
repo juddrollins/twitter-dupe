@@ -27,10 +27,9 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 		dao:  db.InitDb(&cfig.Ddb),
 	}
 
-	log.Println(event.PathParameters["id"])
-	log.Println(event.Path)
+	log.Println("Id path param: " + event.PathParameters["id"])
 
-	var user, err = ctx.dao.GetRecord("juddrollins", "")
+	var user, err = ctx.dao.QueryRecord(event.PathParameters["id"])
 	if err != nil {
 		log.Println(err.Error())
 	}

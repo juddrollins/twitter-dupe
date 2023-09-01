@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"github.com/juddrollins/twitter-dupe/cmd/config"
@@ -8,6 +8,6 @@ import (
 //Not used at the moment
 
 type CTX struct {
-	cfig config.Config
-	dao  *db.Dao
+	Cfig config.Config
+	Dao  *db.Dao
 }
