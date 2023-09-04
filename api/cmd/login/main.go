@@ -65,11 +65,16 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	}
 
 	// Create JWT ?? //TODO
-	var success = map[string]string{
-		"success": "true",
+	var jwt, jwt_err = util.GenerateJWT(user[0].PK)
+	if jwt_err != nil {
+		log.Println(err.Error())
 	}
 
-	body, err := json.Marshal(success)
+	var token_object = map[string]string{
+		"token": jwt,
+	}
+
+	body, err := json.Marshal(token_object)
 	if err != nil {
 		return Response{StatusCode: 404}, err
 	}

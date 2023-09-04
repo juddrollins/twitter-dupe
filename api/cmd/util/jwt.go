@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -8,13 +9,20 @@ import (
 
 var signingSecret = []byte("this is a secret")
 
+type claims struct {
+	Username   string    `json:"user"`
+	Exp        time.Time `json:"exp"`
+	Authorized bool      `json:"authorized"`
+	jwt.StandardClaims
+}
+
 // Create a JWT token
-func GenerateJWT() (string, error) {
+func GenerateJWT(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = time.Now().Add(10 * time.Minute)
-	claims["authorized"] = true
-	claims["user"] = "username"
+	claims["Exp"] = time.Now().Add(10 * time.Minute)
+	claims["Authorized"] = true
+	claims["User"] = username
 
 	tokenString, err := token.SignedString(signingSecret)
 	if err != nil {
@@ -25,23 +33,25 @@ func GenerateJWT() (string, error) {
 }
 
 // Validate a JWT token
-func ValidateJWT() (bool, error) {
-	tokenString, err := GenerateJWT()
-	if err != nil {
-		return false, err
-	}
-
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+func ParseJWT(tokenString string) (*claims, error) {
+	// Parse the JWT token with the provided secret key.
+	token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		return signingSecret, nil
 	})
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return true, nil
+	// Check if the token is valid.
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
 	}
 
-	return false, nil
+	// Extract custom claims from the token.
+	if claims, ok := token.Claims.(*claims); ok {
+		return claims, nil
+	}
+
+	return nil, fmt.Errorf("failed to parse claims")
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/juddrollins/twitter-dupe/cmd/util"
 )
 
 type Statement struct {
@@ -31,13 +32,16 @@ func Handler(request events.APIGatewayV2CustomAuthorizerV2Request) (Authorizatio
 	//token := strings.Split(request.Headers["Authorization"], " ")[1]
 	token := strings.Split(request.Headers["authorization"], " ")[1]
 
-	log.Println(request)
-	log.Println(token)
+	parsedToken, err := util.ParseJWT(token)
+	if err != nil {
+		return AuthorizationResponse{}, fmt.Errorf(err.Error())
+	}
+	log.Println(parsedToken)
 
 	// Your token validation logic goes here.
 	// Check if the token is valid and if the user has the necessary permissions.
 
-	if token == "validToken" {
+	if parsedToken.Authorized {
 		// If the token is valid, allow access.
 		return AuthorizationResponse{
 			PrincipalID: "user123", // Change this to the authenticated user's ID or username.
