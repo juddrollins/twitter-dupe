@@ -25,6 +25,10 @@ type LoginUser struct {
 func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
 
+	log.Print(event)
+	log.Println(event.RequestContext.ResourceID)
+	log.Println(event.Resource)
+
 	v := validator.New()
 	var cfig = config.New()
 	var ctx = util.CTX{

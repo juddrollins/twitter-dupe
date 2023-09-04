@@ -9,6 +9,12 @@ custom:
 provider:
   name: aws
   runtime: go1.x
+  httpApi:
+    authorizers:
+      authorizer:
+        type: request
+        functionName: authorizerFunc
+        identitySource: $request.header.Authorization
   iam:
     role:
       statements:
@@ -71,12 +77,15 @@ functions:
       - httpApi:
           path: /user/{id}
           method: get
+          authorizer: authorizer
   login:
     handler: bin/login
     events:
       - httpApi:
           path: /login
           method: post
+  authorizerFunc:
+    handler: bin/authorizer
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

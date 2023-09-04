@@ -3,6 +3,7 @@
 Query Statement - why do you need the address of the types package *** pointers that implement when objects dont
 How to create global util type in main package? Util could not be found in same package but different file
 Is there an overall theme to go design?? What are basic principals/good documentation/book for this?
+Context origin/ best practices?
 
 --- err.(validator.ValidationErrors) --- what is this saying (register, main.go)
 
