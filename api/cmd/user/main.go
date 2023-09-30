@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"log"
 
@@ -9,27 +10,23 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/juddrollins/twitter-dupe/cmd/config"
 	"github.com/juddrollins/twitter-dupe/db"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type Response events.APIGatewayProxyResponse
 
-type CTX struct {
-	cfig config.Config
-	dao  *db.Dao
+type handler struct {
+	validator *validator.Validate
+	cfig      config.Config
+	dao       *db.Dao
 }
 
-func Handler(event events.APIGatewayProxyRequest) (Response, error) {
+func (h *handler) Handler(con context.Context, event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
-
-	var cfig = config.New()
-	var ctx = &CTX{
-		cfig: cfig,
-		dao:  db.InitDb(&cfig.Ddb),
-	}
 
 	log.Println("Id path param: " + event.PathParameters["id"])
 
-	var user, err = ctx.dao.QueryRecord(event.PathParameters["id"])
+	var user, err = h.dao.QueryRecord(event.PathParameters["id"])
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -55,5 +52,11 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 
 func main() {
 	log.Println("Register Lambda Started")
-	lambda.Start(Handler)
+	cfig := config.New()
+	var h = handler{
+		validator: validator.New(),
+		cfig:      cfig,
+		dao:       db.InitDb(&cfig.Ddb),
+	}
+	lambda.Start(h.Handler)
 }

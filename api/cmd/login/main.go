@@ -22,25 +22,20 @@ type LoginUser struct {
 	Password string `json:"password" validate:"required,min=8"`
 }
 
-func Handler(event events.APIGatewayProxyRequest) (Response, error) {
+type handler struct {
+	validator *validator.Validate
+	cfig      config.Config
+	dao       *db.Dao
+}
+
+func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
-
-	log.Print(event)
-	log.Println(event.RequestContext.ResourceID)
-	log.Println(event.Resource)
-
-	v := validator.New()
-	var cfig = config.New()
-	var ctx = util.CTX{
-		Cfig: cfig,
-		Dao:  db.InitDb(&cfig.Ddb),
-	}
 
 	var input LoginUser
 	json.Unmarshal([]byte(event.Body), &input)
 
 	// Validate User Input to match RegisterUser struct
-	validationError := v.Struct(input)
+	validationError := h.validator.Struct(input)
 	if validationError != nil {
 		for _, e := range validationError.(validator.ValidationErrors) {
 			if e != nil {
@@ -50,7 +45,7 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 		}
 	}
 
-	var user, err = ctx.Dao.QueryRecord(input.Username)
+	var user, err = h.dao.QueryRecord(input.Username)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -95,5 +90,13 @@ func Handler(event events.APIGatewayProxyRequest) (Response, error) {
 
 func main() {
 	log.Println("Login Lambda Started")
-	lambda.Start(Handler)
+
+	cfig := config.New()
+	var h = handler{
+		validator: validator.New(),
+		cfig:      cfig,
+		dao:       db.InitDb(&cfig.Ddb),
+	}
+
+	lambda.Start(h.Handler)
 }
