@@ -1,5 +1,6 @@
 "use client";
 import Login from "@/components/login";
+import { useRouter } from "next/navigation";
 import { ReactNode, createContext, useContext, useState } from "react";
 
 type AuthProviderProps = {
@@ -23,11 +24,13 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState("");
+  const router = useRouter()
 
   const login = (userInfo: userInfo) => {
     console.log("logging in");
     // You may want to perform additional validation here
     setUser(userInfo.username);
+    router.push('/home')
   };
 
   const logout = () => {

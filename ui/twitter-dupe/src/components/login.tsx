@@ -41,14 +41,11 @@ export default function SignIn() {
       username: data.get("email")?.toString() || "",
       password: data.get("password")?.toString() || "",
     });
-    console.log("here")
   };
 
-  console.log({user});
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <Box
         sx={{
           marginTop: 8,
@@ -90,8 +87,9 @@ export default function SignIn() {
           />
           <Button
             type="submit"
-            fullWidth
             variant="contained"
+            fullWidth
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             sx={{ mt: 3, mb: 2 }}
           >
             Sign In
