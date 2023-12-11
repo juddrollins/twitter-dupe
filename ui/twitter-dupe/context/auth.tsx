@@ -1,7 +1,16 @@
 "use client";
 import Login from "@/components/login";
 import { useRouter } from "next/navigation";
-import { ReactNode, createContext, useContext, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import useDataApi from "../lib/fetchData";
+import callLogin from "../api/login";
+import Loading from "@/components/loading";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -23,19 +32,28 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState("");
-  const router = useRouter()
+  const [user, setUser] = useState("null");
+  const router = useRouter();
+  const { data, error, loading, fetchData } = useDataApi(callLogin);
+
+  useEffect(() => {
+    if (data?.token) {
+      setUser(data.token);
+      router.push("/home");
+    }
+  }, [data]);
 
   const login = (userInfo: userInfo) => {
     console.log("logging in");
-    // You may want to perform additional validation here
-    setUser(userInfo.username);
-    router.push('/home')
+    fetchData(userInfo.username, userInfo.password);
   };
 
   const logout = () => {
     setUser("null");
   };
+
+  if (loading) return <Loading />;
+  if (error) return <div>error: {error.message}</div>;
 
   if (user === "") {
     return (

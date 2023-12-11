@@ -78,8 +78,9 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 		IsBase64Encoded: false,
 		Body:            buf.String(),
 		Headers: map[string]string{
-			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "register-handler",
+			"Content-Type":                "application/json",
+			"X-MyCompany-Func-Reply":      "register-handler",
+			"Access-Control-Allow-Origin": "*", // Required for CORS support to work
 		},
 	}
 

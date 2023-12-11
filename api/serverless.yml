@@ -10,6 +10,7 @@ provider:
   name: aws
   runtime: go1.x
   httpApi:
+    cors: true
     authorizers:
       authorizer:
         type: request

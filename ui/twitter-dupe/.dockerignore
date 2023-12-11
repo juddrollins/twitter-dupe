@@ -1,0 +1,18 @@
+# Exclude node_modules directory
+node_modules
+
+# Exclude development-related files and directories
+.vscode
+.DS_Store
+.env
+.next
+out
+build
+
+# Exclude version control files
+.git
+.gitignore
+.gitattributes
+
+# Exclude npm package lock file
+package-lock.json
