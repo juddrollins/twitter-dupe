@@ -50,6 +50,7 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 		log.Println(err.Error())
 	}
 
+	//TODO check multiple users because username is not unique
 	var user_data = strings.Split(user[0].Data, "::")
 	var user_password = user_data[1]
 
