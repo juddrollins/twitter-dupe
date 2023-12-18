@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
-	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -50,18 +49,10 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 		log.Println(err.Error())
 	}
 
-	//TODO check multiple users because username is not unique
-	var user_data = strings.Split(user[0].Data, "::")
-	var user_password = user_data[1]
+	// Check all usernames for matching password
+	validatedUser, err := util.LoginUser(user, input.Password)
 
-	// Check if password matches
-	if !util.CheckPasswordHash(input.Password, user_password) {
-		log.Println("Password does not match")
-		return Response{StatusCode: 400}, errors.New("password does not match")
-	}
-
-	// Create JWT ?? //TODO
-	var jwt, jwt_err = util.GenerateJWT(user[0].PK)
+	var jwt, jwt_err = util.GenerateJWT(validatedUser.PK)
 	if jwt_err != nil {
 		log.Println(err.Error())
 	}

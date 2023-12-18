@@ -41,7 +41,7 @@ func Handler(request events.APIGatewayV2CustomAuthorizerV2Request) (Authorizatio
 	// Your token validation logic goes here.
 	// Check if the token is valid and if the user has the necessary permissions.
 
-	if parsedToken.Authorized {
+	if parsedToken.Valid() != nil {
 		// If the token is valid, allow access.
 		return AuthorizationResponse{
 			PrincipalID: "user123", // Change this to the authenticated user's ID or username.
