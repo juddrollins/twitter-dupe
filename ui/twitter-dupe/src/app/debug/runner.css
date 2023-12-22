@@ -1,0 +1,78 @@
+.animation-container {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+}
+
+.duck,
+.stick-figure {
+  position: absolute;
+  bottom: 0;
+  font-size: 24px;
+}
+
+.stick-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.head {
+  width: 20px;
+  height: 20px;
+  background-color: black;
+  border-radius: 50%;
+  margin-bottom: 5px;
+}
+
+.body {
+  width: 10px;
+  height: 30px;
+  background-color: black;
+  margin-bottom: 5px;
+}
+
+.arms {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.arm {
+  width: 5px;
+  height: 15px;
+  background-color: black;
+  margin: 0 3px;
+  animation: runAnimation 0.5s infinite alternate;
+}
+
+.left-arm {
+  animation-delay: 0.2s;
+}
+
+.right-arm {
+  animation-delay: 0s;
+}
+
+.legs {
+  display: flex;
+  justify-content: space-between;
+}
+
+.leg {
+  width: 5px;
+  height: 20px;
+  background-color: black;
+  margin: 0 3px;
+  animation: runAnimation 0.5s infinite alternate;
+}
+
+@keyframes runAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(5px);
+  }
+}
