@@ -20,19 +20,22 @@ jobs:
         uses: actions/setup-node@v2
         with: 
             node-version: '19.x'
-      
-      - name: Install dependencies
-        run: cd ui/twitter-dupe && npm install
-      
-      - name: Build Next.js project
-        run: cd ui/twitter-dupe && npm run build
-        
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::082349306489:role/github-actions-s3
-          role-session-name: session
           
-      - name: Deploy static site to S3 bucket
-        run: aws s3 sync ui/twitter-dupe/out/ s3://twitter-dupe --delete
+      - name: Print directory
+        run: echo ${{ github.workspace }}
+      
+      # - name: Install dependencies
+      #   run: cd ui/twitter-dupe && npm install
+      
+      # - name: Build Next.js project
+      #   run: cd ui/twitter-dupe && npm run build
+        
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v3
+      #   with:
+      #     aws-region: us-east-1
+      #     role-to-assume: arn:aws:iam::082349306489:role/github-actions-s3
+      #     role-session-name: session
+          
+      # - name: Deploy static site to S3 bucket
+      #   run: aws s3 sync ui/twitter-dupe/out/ s3://twitter-dupe --delete
