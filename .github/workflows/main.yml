@@ -25,7 +25,7 @@ jobs:
         run: cd ui/twitter-dupe && npm install
       
       - name: Build Next.js project
-        run: npm run build
+        run: cd ui/twitter-dupe && npm run build
         
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
