@@ -1,16 +1,38 @@
+name: Deploy Twitter UI to S3 bucket
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
+permissions:
+  id-token: write
+  
 jobs:
-  example_job:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
 
-    - name: Print GitHub Token
-      run: echo "GITHUB_TOKEN=${{ github.token }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2
+        with: 
+            node-version: '19.x'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Build Next.js project
+        run: npm run build
+        
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::082349306489:role/github-actions-s3
+          role-session-name: session
+          
+      - name: Deploy static site to S3 bucket
+        run: aws s3 sync out/ s3://twitter-dupe --delete
