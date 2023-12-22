@@ -38,4 +38,4 @@ jobs:
           role-session-name: session
           
       - name: Deploy static site to S3 bucket
-        run: aws s3 sync ui/twitter-dupe/ s3://twitter-dupe --delete
+        run: aws s3 sync ui/twitter-dupe/out/ s3://twitter-dupe --delete
