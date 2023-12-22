@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
+// ENV variables
 type (
 	Env      string
 	Database struct {
