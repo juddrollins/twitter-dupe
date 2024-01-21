@@ -8,6 +8,7 @@ type LoginResponse = {
 };
 
 const callLogin = async (username: string, password: string) => {
+  console.log({ username, password })
   const response = await fetch(`${baseUrl}/login`, {
     method: "POST",
     headers: {

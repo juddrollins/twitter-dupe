@@ -1,7 +1,5 @@
-import SignIn from '@/components/login'
+import SignIn from "@/components/login";
 
-export default function Home() {
-  return (
-   <SignIn />
-  )
+export default function SignInPage() {
+  return <SignIn />;
 }

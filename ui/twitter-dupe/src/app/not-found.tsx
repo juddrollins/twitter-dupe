@@ -19,7 +19,7 @@ export default function NotFound() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className=" h-screen">
       <Image src={notFound} alt="404 Not Found" width={500} height={400} />
       <h1 style={{ fontSize: "3rem", margin: "20px 0" }}>
         Oops! Page Not Found

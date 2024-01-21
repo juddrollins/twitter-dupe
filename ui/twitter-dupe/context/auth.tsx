@@ -36,6 +36,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
   const { data, error, loading, fetchData } = useDataApi(callLogin);
 
+  console.log({user})
+
   useEffect(() => {
     if (data?.token) {
       setUser(data.token);

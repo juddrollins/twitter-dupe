@@ -2,17 +2,16 @@
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useAuth } from "../../context/auth";
+import { useRouter } from "next/navigation";
 
 function Copyright(props: any) {
   return (
@@ -33,18 +32,22 @@ function Copyright(props: any) {
 }
 
 export default function SignIn() {
+  
   const { login, user } = useAuth();
+  const router = useRouter();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     login({
-      username: data.get("email")?.toString() || "",
+      username: data.get("username")?.toString() || "",
       password: data.get("password")?.toString() || "",
     });
   };
 
 
   return (
+    
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
@@ -65,10 +68,10 @@ export default function SignIn() {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
             autoFocus
           />
           <TextField
@@ -94,18 +97,15 @@ export default function SignIn() {
           >
             Sign In
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
+          <Button
+          onClick={() => router.push("/register")}
+            variant="contained"
+            fullWidth
+            className="bg-yellow-400 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Register
+          </Button>
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
