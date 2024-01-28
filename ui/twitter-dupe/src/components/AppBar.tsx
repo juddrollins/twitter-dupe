@@ -12,9 +12,13 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormGroup from "@mui/material/FormGroup";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/auth";
 
 export default function MenuAppBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const router = useRouter();
+  const {logout} = useAuth();
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     console.log(event.currentTarget)
@@ -22,6 +26,7 @@ export default function MenuAppBar() {
   };
 
   const handleClose = () => {
+    router.push("/login");
     setAnchorEl(null);
   };
 

@@ -52,7 +52,7 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 	// Check all usernames for matching password
 	validatedUser, err := util.LoginUser(user, input.Password)
 
-	var jwt, jwt_err = util.GenerateJWT(validatedUser.PK)
+	var jwt, jwt_err = util.GenerateJWT(validatedUser)
 	if jwt_err != nil {
 		log.Println(err.Error())
 	}

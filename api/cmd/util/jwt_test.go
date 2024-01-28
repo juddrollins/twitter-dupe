@@ -4,13 +4,21 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/juddrollins/twitter-dupe/db"
 )
 
 func TestGenerateJWT(t *testing.T) {
+	user := db.Entry{
+		PK:   "testuser",
+		SK:   "testuser",
+		Data: "testuser::testpassword",
+	}
+
 	username := "testuser"
 	expectedExpiresAt := time.Now().Add(10 * time.Minute).Unix()
 
-	tokenString, err := GenerateJWT(username)
+	tokenString, err := GenerateJWT(user)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

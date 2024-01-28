@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -32,7 +31,6 @@ type handler struct {
 }
 
 func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error) {
-	var buf bytes.Buffer
 
 	var input RegisterUser
 	json.Unmarshal([]byte(event.Body), &input)
@@ -46,6 +44,17 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 				return Response{StatusCode: 400}, errors.New(e.Field())
 			}
 		}
+	}
+
+	user, err := h.dao.QueryRecord(input.Username)
+	if err != nil {
+		log.Println(err.Error())
+		return Response{StatusCode: 500, Body: "error querying for existing user"}, nil
+	}
+	if len(user) != 0 {
+		log.Println("User already exists")
+		log.Println(user)
+		return Response{StatusCode: 400, Body: "user already exists"}, nil
 	}
 
 	// Hash password
@@ -62,21 +71,16 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 		Data: uuiid_username + "::" + password,
 	}
 
-	var testValue, err = h.dao.CreateRecord(entry)
+	// Create user record in db
+	err = h.dao.CreateRecord(entry)
 	if err != nil {
 		fmt.Println(err.Error())
+		return Response{StatusCode: 500}, errors.New("Error creating user")
 	}
-
-	body, err := json.Marshal(testValue)
-	if err != nil {
-		return Response{StatusCode: 404}, err
-	}
-	json.HTMLEscape(&buf, body)
 
 	resp := Response{
-		StatusCode:      200,
+		StatusCode:      201,
 		IsBase64Encoded: false,
-		Body:            buf.String(),
 		Headers: map[string]string{
 			"Content-Type":                "application/json",
 			"X-MyCompany-Func-Reply":      "register-handler",

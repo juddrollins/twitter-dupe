@@ -8,11 +8,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
-func (dao Dao) CreateRecord(entry Entry) (Entry, error) {
+func (dao Dao) CreateRecord(entry Entry) error {
 	//entry.PK = uuid.New().String()
 	entityParsed, err := attributevalue.MarshalMap(entry)
 	if err != nil {
-		return Entry{}, err
+		return err
 	}
 
 	input := &dynamodb.PutItemInput{
@@ -22,7 +22,7 @@ func (dao Dao) CreateRecord(entry Entry) (Entry, error) {
 
 	_, err = dao.db.Client.PutItem(context.Background(), input)
 	if err != nil {
-		return Entry{}, err
+		return err
 	}
-	return entry, nil
+	return nil
 }

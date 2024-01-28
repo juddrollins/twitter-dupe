@@ -22,7 +22,7 @@ type userInfo = {
 };
 
 const AuthContext = createContext({
-  user: "",
+  user: null,
   login: (userInfo: userInfo) => {},
   logout: () => {},
 });
@@ -32,15 +32,17 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState("null");
+  const [user, setUser] = useState(null);
   const router = useRouter();
   const { data, error, loading, fetchData } = useDataApi(callLogin);
 
-  console.log({user})
-
   useEffect(() => {
     if (data?.token) {
-      setUser(data.token);
+      const base64Url = data.token.split(".")[1];
+      const decodedUserString = atob(base64Url);
+      const decodedUser = JSON.parse(decodedUserString);
+      setUser(decodedUser);
+      console.log(decodedUser)
       router.push("/home");
     }
   }, [data]);
@@ -51,13 +53,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = () => {
-    setUser("null");
+    setUser(null);
   };
 
   if (loading) return <Loading />;
   if (error) return <div>error: {error.message}</div>;
 
-  if (user === "") {
+  if (!user) {
     return (
       <AuthContext.Provider value={{ user, login, logout }}>
         <Login />
