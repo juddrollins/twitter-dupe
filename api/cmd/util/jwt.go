@@ -38,7 +38,8 @@ func GenerateJWT(userEntry db.Entry) (string, error) {
 }
 
 // Validate a JWT token
-func ParseJWT(tokenString string) (*jwt.StandardClaims, error) {
+func ParseJWT(tokenString string) (*CustomClaims, error) {
+
 	// Parse the JWT token with the provided secret key.
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return signingSecret, nil
@@ -49,7 +50,7 @@ func ParseJWT(tokenString string) (*jwt.StandardClaims, error) {
 	}
 
 	// Extract custom claims from the token.
-	claims, ok := token.Claims.(*jwt.StandardClaims)
+	claims, ok := token.Claims.(*CustomClaims)
 	if ok {
 		return claims, nil
 	}

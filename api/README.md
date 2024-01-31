@@ -14,4 +14,6 @@ Why do you need to HTML Escape everything before passing it back through the ser
 
 What to do with authorizer IAM Role??
 
+serverless is failing to deploy remotely because the bin files do not exist in the remote repo.
+
 

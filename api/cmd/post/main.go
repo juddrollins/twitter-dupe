@@ -46,33 +46,33 @@ func (h *handler) Handler(con context.Context, event events.APIGatewayProxyReque
 
 	randomNumber := rand.Intn(10) + 1
 
-	// Create a new db entry for a post
-	entry := db.Entry{
-		PK:   "post::" + string(randomNumber),
-		SK:   "",
-		Data: "::",
-	}
+	// // Create a new db entry for a post
+	// entry := db.Entry{
+	// 	PK:   "post::" + string(randomNumber),
+	// 	SK:   "",
+	// 	Data: "::",
+	// }
 
-	var user, err = h.dao.CreateRecord()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	// var user, err = h.dao.CreateRecord()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 
-	body, err := json.Marshal(user)
-	if err != nil {
-		return Response{StatusCode: 404}, err
-	}
-	json.HTMLEscape(&buf, body)
+	// body, err := json.Marshal(user)
+	// if err != nil {
+	// 	return Response{StatusCode: 404}, err
+	// }
+	// json.HTMLEscape(&buf, body)
 
-	resp := Response{
-		StatusCode:      200,
-		IsBase64Encoded: false,
-		Body:            buf.String(),
-		Headers: map[string]string{
-			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "register-handler",
-		},
-	}
+	// resp := Response{
+	// 	StatusCode:      200,
+	// 	IsBase64Encoded: false,
+	// 	Body:            buf.String(),
+	// 	Headers: map[string]string{
+	// 		"Content-Type":           "application/json",
+	// 		"X-MyCompany-Func-Reply": "register-handler",
+	// 	},
+	// }
 
 	return resp, nil
 }

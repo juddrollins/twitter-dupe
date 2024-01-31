@@ -24,6 +24,16 @@ type handler struct {
 func (h *handler) Handler(con context.Context, event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
 
+	lambdaAuthContext, ok := event.RequestContext.Authorizer["lambda"].(map[string]any)
+	if !ok {
+		return Response{StatusCode: 500, Body: "no auth context"}, nil
+	}
+
+	log.Println(event.RequestContext.Authorizer["lambda"].(map[string]any))
+
+	//Put this user id that has been validate by the authorizer as the post author
+	log.Println(lambdaAuthContext["user-id"])
+
 	log.Println("Id path param: " + event.PathParameters["id"])
 
 	var user, err = h.dao.QueryRecord(event.PathParameters["id"])

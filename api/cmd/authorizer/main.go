@@ -28,38 +28,45 @@ type AuthorizationResponse struct {
 }
 
 // Handler is the Lambda authorizer function handler.
-func Handler(request events.APIGatewayV2CustomAuthorizerV2Request) (AuthorizationResponse, error) {
+func Handler(request events.APIGatewayV2CustomAuthorizerV2Request) (events.APIGatewayCustomAuthorizerResponse, error) {
 	//token := strings.Split(request.Headers["Authorization"], " ")[1]
 	token := strings.Split(request.Headers["authorization"], " ")[1]
 
 	parsedToken, err := util.ParseJWT(token)
 	if err != nil {
-		return AuthorizationResponse{}, fmt.Errorf(err.Error())
+		return events.APIGatewayCustomAuthorizerResponse{}, fmt.Errorf(err.Error())
 	}
-	log.Println(parsedToken)
 
-	// Your token validation logic goes here.
-	// Check if the token is valid and if the user has the necessary permissions.
+	tokenValidationError := parsedToken.Valid()
+	if tokenValidationError != nil {
+		return events.APIGatewayCustomAuthorizerResponse{}, fmt.Errorf(tokenValidationError.Error())
+	}
 
-	if parsedToken.Valid() != nil {
+	enrichedContext := map[string]any{
+		"user-id": parsedToken.User.SK,
+	}
+
+	if tokenValidationError == nil {
+		log.Println("the token is valid")
 		// If the token is valid, allow access.
-		return AuthorizationResponse{
-			PrincipalID: "user123", // Change this to the authenticated user's ID or username.
-			PolicyDocument: PolicyDocument{
+		return events.APIGatewayCustomAuthorizerResponse{
+			PrincipalID: parsedToken.User.SK, // Change this to the authenticated user's ID or username.
+			PolicyDocument: events.APIGatewayCustomAuthorizerPolicy{
 				Version: "2012-10-17",
-				Statement: []Statement{
+				Statement: []events.IAMPolicyStatement{
 					{
-						Action:   "execute-api:Invoke",
+						Action:   []string{"execute-api:Invoke"},
 						Effect:   "Allow",
-						Resource: request.RouteArn,
+						Resource: []string{request.RouteArn},
 					},
 				},
 			},
+			Context: enrichedContext,
 		}, nil
 	}
 
 	// If the token is not valid or the user doesn't have the necessary permissions, deny access.
-	return AuthorizationResponse{}, fmt.Errorf("Unauthorized")
+	return events.APIGatewayCustomAuthorizerResponse{}, fmt.Errorf("Unauthorized")
 }
 
 func main() {
