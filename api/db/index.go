@@ -5,9 +5,11 @@ import (
 )
 
 type Entry struct {
-	PK   string `json:"PK"`
-	SK   string `json:"SK"`
-	Data string `json:"Data"`
+	PK        string `json:"PK"`
+	SK        string `json:"SK"`
+	Data      string `json:"Data"`
+	CreatedAt string `json:"CreatedAt"`
+	UpdatedAt string `json:"UpdatedAt"`
 }
 
 type EntryService interface {

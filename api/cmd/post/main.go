@@ -1,16 +1,19 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"math/rand"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/google/uuid"
 	"github.com/juddrollins/twitter-dupe/cmd/config"
+	"github.com/juddrollins/twitter-dupe/cmd/util"
 	"github.com/juddrollins/twitter-dupe/db"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -29,11 +32,11 @@ type handler struct {
 
 func (h *handler) Handler(con context.Context, event events.APIGatewayProxyRequest) (Response, error) {
 
-	var input Post
-	json.Unmarshal([]byte(event.Body), &input)
+	var post Post
+	json.Unmarshal([]byte(event.Body), &post)
 
-	// Validate User Input to match RegisterUser struct
-	validationError := h.validator.Struct(input)
+	// Validate User Input to match Content struct
+	validationError := h.validator.Struct(post)
 	if validationError != nil {
 		for _, e := range validationError.(validator.ValidationErrors) {
 			if e != nil {
@@ -42,37 +45,36 @@ func (h *handler) Handler(con context.Context, event events.APIGatewayProxyReque
 			}
 		}
 	}
-	var buf bytes.Buffer
+
+	userId, err := util.GetUserContext(event)
+	if err != nil {
+		return Response{StatusCode: 500, Body: "no auth context"}, nil
+	}
 
 	randomNumber := rand.Intn(10) + 1
 
-	// // Create a new db entry for a post
-	// entry := db.Entry{
-	// 	PK:   "post::" + string(randomNumber),
-	// 	SK:   "",
-	// 	Data: "::",
-	// }
+	// Create a new db entry for a post
+	entry := db.Entry{
+		PK:        "post::" + fmt.Sprintf("%v", randomNumber),
+		SK:        userId + "::" + uuid.NewString(),
+		Data:      post.Content,
+		CreatedAt: time.Now().String(),
+		UpdatedAt: time.Now().String(),
+	}
 
-	// var user, err = h.dao.CreateRecord()
-	// if err != nil {
-	// 	log.Println(err.Error())
-	// }
+	err = h.dao.CreateRecord(entry)
+	if err != nil {
+		log.Println(err.Error())
+	}
 
-	// body, err := json.Marshal(user)
-	// if err != nil {
-	// 	return Response{StatusCode: 404}, err
-	// }
-	// json.HTMLEscape(&buf, body)
-
-	// resp := Response{
-	// 	StatusCode:      200,
-	// 	IsBase64Encoded: false,
-	// 	Body:            buf.String(),
-	// 	Headers: map[string]string{
-	// 		"Content-Type":           "application/json",
-	// 		"X-MyCompany-Func-Reply": "register-handler",
-	// 	},
-	// }
+	resp := Response{
+		StatusCode:      201,
+		IsBase64Encoded: false,
+		Headers: map[string]string{
+			"Content-Type":           "application/json",
+			"X-MyCompany-Func-Reply": "register-handler",
+		},
+	}
 
 	return resp, nil
 }

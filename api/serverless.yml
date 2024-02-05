@@ -66,12 +66,14 @@ package:
 
 functions:
   functions:
+  
   register:
     handler: bin/register
     events:
       - httpApi:
           path: /register
           method: post
+  
   user:
     handler: bin/user
     events:
@@ -79,6 +81,7 @@ functions:
           path: /user/{id}
           method: get
           authorizer: authorizer
+  
   login:
     handler: bin/login
     events:
@@ -87,6 +90,22 @@ functions:
           method: post
   authorizerFunc:
     handler: bin/authorizer
+
+  post:
+    handler: bin/post
+    events:
+      - httpApi:
+          path: /post
+          method: post
+          authorizer: authorizer
+ 
+  getUserPosts:
+    handler: bin/getUserPosts
+    events:
+      - httpApi:
+          path: /user/{id}/posts
+          method: get
+          authorizer: authorizer
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

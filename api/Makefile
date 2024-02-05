@@ -1,6 +1,6 @@
-.PHONY: build clean deploy deploy-function
+.PHONY: build-all clean deploy deploy-function
 
-build-all: build-register build-login build-authorizer build-user
+build-all: build-register build-login build-authorizer build-user build-post build-getUserPosts
 
 build-register:
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/register cmd/register/main.go
@@ -14,10 +14,16 @@ build-authorizer:
 build-user:
 	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/user cmd/user/main.go
 
+build-post:
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/post cmd/post/main.go
+
+build-getUserPosts:
+	env GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/getUserPosts cmd/getUserPosts/main.go
+
 clean:
 	rm -rf ./bin
 
-deploy: clean build
+deploy: clean build-all
 	sls deploy --verbose
 
 deploy-register: clean build-register
@@ -31,3 +37,9 @@ deploy-authorizer: clean build-authorizer
 
 deploy-user: clean build-user
 	sls deploy function --function user --verbose
+
+deploy-post: clean build-post
+	sls deploy function --function post --verbose
+
+deploy-getUserPosts: clean build-getUserPosts
+	sls deploy function --function getUserPosts --verbose
