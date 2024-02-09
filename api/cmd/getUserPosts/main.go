@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
+	"sync"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -24,17 +26,34 @@ type handler struct {
 	dao       *db.Dao
 }
 
+type posts struct {
+	MU   sync.Mutex
+	Post []db.Entry
+}
+
 func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
 
 	userId := event.PathParameters["id"]
 
-	posts, err := h.dao.QueryRecord(userId)
-	if err != nil {
-		log.Println(err.Error())
-	}
+	wg := &sync.WaitGroup{}
+	posts := posts{}
 
-	body, err := json.Marshal(posts)
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			post, err := h.dao.QueryRecord(userId + "::" + fmt.Sprintf("%v", i))
+			if err != nil {
+				log.Println(err.Error())
+			}
+			posts.MU.Lock()
+			posts.Post = append(posts.Post, post...)
+		}(i)
+	}
+	wg.Wait()
+
+	body, err := json.Marshal(posts.Post)
 	if err != nil {
 		return Response{StatusCode: 404}, err
 	}
