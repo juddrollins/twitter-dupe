@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/juddrollins/twitter-dupe/cmd/config"
+	"github.com/juddrollins/twitter-dupe/cmd/util"
 	"github.com/juddrollins/twitter-dupe/db"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -34,7 +35,10 @@ type posts struct {
 func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error) {
 	var buf bytes.Buffer
 
-	userId := event.PathParameters["id"]
+	userId, err := util.GetUserContext(event)
+	if err != nil {
+		return Response{StatusCode: 500, Body: "no auth context"}, nil
+	}
 	log.Println("userId: ", userId)
 
 	wg := &sync.WaitGroup{}
@@ -44,8 +48,9 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			query := "post" + "::" + fmt.Sprintf("%v", i)
-			post, err := h.dao.QueryRecord(query)
+			queryPK := "post" + "::" + fmt.Sprintf("%v", i)
+			querySK := userId
+			post, err := h.dao.QueryRecordSK(queryPK, querySK)
 			if err != nil {
 				log.Println(err.Error())
 			}

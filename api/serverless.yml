@@ -103,7 +103,7 @@ functions:
     handler: bin/getUserPosts
     events:
       - httpApi:
-          path: /user/{id}/posts
+          path: /user/posts
           method: get
           authorizer: authorizer
 #    The following are a few example events you can configure
