@@ -35,6 +35,7 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 	var buf bytes.Buffer
 
 	userId := event.PathParameters["id"]
+	log.Println("userId: ", userId)
 
 	wg := &sync.WaitGroup{}
 	posts := posts{}
@@ -43,14 +44,18 @@ func (h *handler) Handler(event events.APIGatewayProxyRequest) (Response, error)
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			post, err := h.dao.QueryRecord(userId + "::" + fmt.Sprintf("%v", i))
+			query := "post" + "::" + fmt.Sprintf("%v", i)
+			post, err := h.dao.QueryRecord(query)
 			if err != nil {
 				log.Println(err.Error())
 			}
 			posts.MU.Lock()
 			posts.Post = append(posts.Post, post...)
+			posts.MU.Unlock()
 		}(i)
+
 	}
+	log.Println("Waiting for all go routines to finish")
 	wg.Wait()
 
 	body, err := json.Marshal(posts.Post)
